@@ -1,0 +1,40 @@
+.block {
+    display: block;
+    width: 50%;
+    border: 5px solid;
+    background-color: violet;
+    padding: 14px 28px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: auto;
+}
+
+.cont2{
+    width: 80%;
+}
+
+#right-side-bar img {
+      width: 50%;
+      margin-left: 25%;
+}
+
+#right-side-bar {
+    width: 50%;
+    float: right;
+}
+
+
+#screen{
+    width: 40%;
+}
+
+#left-side-bar {
+      float: left;
+      font-size: 25px;
+      width: 50%;
+}
+
+#bla h1 {
+    font-size: 20px;
+}
+

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Alkoholiszek</title>
+        {% load static from staticfiles %}
+        <link rel="stylesheet" href="{% static 'base.css' %}" type="text/css">
+        <!-- <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet"> -->
+
+    </head>
+
+    <body>
+
+    
+            <nav id="navbar">
+                <div class="container">
+                    <ul class="menu-left">
+                        <li><a href="{% url 'mysite:register' %}">Zarejestruj lokal</a></li>
+                        <li><a href="{% url 'mysite:about' %}">O nas</a></li>
+                        <li><a href="{% url 'mysite:credits' %}">Podziękowania</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+
+            <header id="logo-header">
+                <div class="container">
+                    <a href="{% url 'mysite:home' %}">
+                        <img src="{% static 'kieliszekwpaincie.png' %}" alt="Alkoholiszek" id="logo-pic">
+                    
+                        <h1>
+                            Alkoholiszek
+                        </h1>
+                    </a>    
+                </div>
+            </header>
+
+            <div id="content">
+                <div class="container">
+                {%block content%}
+
+
+                {%endblock content%}
+                </div>
+            </div>
+
+        <footer id="foot">
+            <div class="container">
+                Alkoholiszek&copy; @All copyrights reserved by JS
+            </div>
+        </footer>
+
+    </body>
+</html>

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load static from staticfiles %}
+<link rel="stylesheet" href="{% static 'home.css' %}" type="text/css">
+
+
+    <div id="head">
+        <div class="cont2">
+            <h1>Zwiedzaj, imprezuj i ciesz się nocnym życiem Warszawy!</h1>
+        </div>
+    </div>
+
+    <div id="side">
+    <div id="left-side-bar">
+            <div class="cont2">
+                <p>
+                    Alkoholiszek to aplikacja, która będzie w stanie wspomóc Cię w wyborze idealnego miejsca na zabawę!
+                    Wystarczy parę ruchów palcem, aby wyznaczyć trase do lokalu, który spełni Twoje wszystkie najśmielsze wymogi.
+                    Już teraz wspomóż nas poprzez dodanie informacji na temat swojego ulubionego klubu, baru, sklepu, a może i nawet restauracji!
+                    Zasada jest jedna - Alkohol. 
+                </p>
+                <button type="button" class="block"><a href="{% url 'mysite:register' %}">Zarejestruj lokal</a></button>
+            </div>
+        </div>
+
+
+        <aside id="right-side-bar">
+            <div class="cont2">
+                <img src="{% static 'screen.jpg' %}" alt="Alkoholiszek" id="screen">
+            </div>
+        </aside>
+    </div>
+
+
+{% endblock content %}
