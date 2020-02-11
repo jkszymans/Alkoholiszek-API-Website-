@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.safestring import mark_safe
 from multiselectfield import MultiSelectField
 from django.core.mail import send_mail
 import calendar
@@ -146,3 +147,18 @@ class Opinion(models.Model):
         send_mail(subject, message, from_email, recipient_list)
 
 
+class Photo(models.Model):
+    name = models.TextField(max_length=30, default="Jazda")
+    photo_img = models.ImageField(upload_to='images/', null=True)
+    is_checked = models.BooleanField(default= False)
+
+    def image_tag(self):
+        if self.photo_img:
+            return mark_safe('<img src="%s" style="width: 100px; height:100px;" />' % self.photo_img.url)
+        else:
+            return 'No Image Found'
+
+    image_tag.short_description = 'Image'
+
+    def __str__(self):
+        return self.name

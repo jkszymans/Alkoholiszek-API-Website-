@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load static from staticfiles %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Photos</title>
+</head>
+<body>
+    {% block content %}
+    {% for i in images %}
+    <li><img src="{{ i.photo_img.url }}" class="img-responsive" style="width: 30%; float: left; margin-right: 10px;" /></li>
+
+    {% endfor %}
+    {% endblock %}
+</body>
+</html>

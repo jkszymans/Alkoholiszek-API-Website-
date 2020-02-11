@@ -1,11 +1,14 @@
 from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from rest_framework import status, generics
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
-from .models import Place, Shot, Drink, Beer, Opinion, OpeningHours
-from .serializers import PlaceDetailSerializer, PlaceListSerializer, OpinionSerializer
+from rest_framework.views import APIView
+from rest_framework.parsers import FileUploadParser
+from .models import Place, Shot, Drink, Beer, Opinion, OpeningHours, Photo
+from .serializers import PlaceDetailSerializer, PlaceListSerializer, OpinionSerializer, PhotoSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter 
 from django_filters import FilterSet
@@ -104,6 +107,10 @@ class PlaceDetail(generics.RetrieveAPIView):
     queryset = Place.objects.all()
 
 
+class PhotoDetail(generics.RetrieveAPIView):
+    serializer_class = PhotoSerializer
+    queryset = Photo.objects.all()
+
 
 @api_view(['GET'])
 def place_random(request, format=None):
@@ -185,3 +192,24 @@ def report_place(request,format=None):
 #     elif request.method == 'DELETE':
 #         place.delete()
 #         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+class PhotoUploadView(APIView):
+    parser_class = (FileUploadParser,)
+
+    def post(self, request, *args, **kwargs):
+
+        photo_serializer = PhotoSerializer(data=request.data)
+        if photo_serializer.is_valid():
+            photo_serializer.save()
+            return Response(photo_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(photo_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+def PhotoList(request):
+      images = Photo.objects.all()
+      return render(request, "photos.html", {'images': images})
