@@ -146,3 +146,8 @@ class Opinion(models.Model):
         send_mail(subject, message, from_email, recipient_list)
 
 
+class Credits(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name

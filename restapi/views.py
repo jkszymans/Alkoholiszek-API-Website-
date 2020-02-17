@@ -4,8 +4,8 @@ from rest_framework.parsers import JSONParser
 from rest_framework import status, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Place, Shot, Drink, Beer, Opinion, OpeningHours
-from .serializers import PlaceDetailSerializer, PlaceListSerializer, OpinionSerializer
+from .models import Place, Shot, Drink, Beer, Opinion, OpeningHours, Credits
+from .serializers import PlaceDetailSerializer, PlaceListSerializer, OpinionSerializer, CreditsSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter 
 from django_filters import FilterSet
@@ -144,6 +144,12 @@ def report_place(request,format=None):
         place.save()
         serializer = PlaceDetailSerializer(place)
         return Response(serializer.data)
+
+
+class CreditsList(generics.ListCreateAPIView):
+    queryset = Credits.objects.all()
+    serializer_class = CreditsSerializer
+
 
 
         
