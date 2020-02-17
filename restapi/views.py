@@ -1,14 +1,17 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import JSONParser
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework import status, generics
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.parsers import FileUploadParser
-from .models import Place, Shot, Drink, Beer, Opinion, OpeningHours, Photo
-from .serializers import PlaceDetailSerializer, PlaceListSerializer, OpinionSerializer, PhotoSerializer
+from rest_framework.viewsets import ModelViewSet
+
+
+from .models import Place, Shot, Drink, Beer, Opinion, OpeningHours, Photo, PlaceReport
+from .serializers import PlaceDetailSerializer, PlaceListSerializer, OpinionSerializer, PhotoSerializer, PlaceReportSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter 
 from django_filters import FilterSet
@@ -208,8 +211,22 @@ class PhotoUploadView(APIView):
             return Response(photo_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
 def PhotoList(request):
       images = Photo.objects.all()
       return render(request, "photos.html", {'images': images})
+
+
+class ReportUpload(APIView):
+    parser_class = (FileUploadParser,)
+
+    def post(self, request, *args, **kwargs):
+
+        report_serializer = PlaceReportSerializer(data=request.data)
+        if report_serializer.is_valid():
+            report_serializer.save()
+            return Response(report_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(report_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+

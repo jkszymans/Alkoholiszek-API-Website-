@@ -7,9 +7,10 @@ urlpatterns = [
     path('<int:pk>/', views.PlaceDetail.as_view(), name='place_detail'),
     path('random/', views.place_random, name='place_random_filtered'),
     path('opinion/',views.opinion, name='opinion'),
-    path('report-place/', views.report_place, name='report_place'),
+    #path('report-place/', views.report_place, name='report_place'),
     path('images/', views.PhotoUploadView.as_view()),
-    path('images/all/', views.PhotoList, name='list')
+    path('images/all/', views.PhotoList, name='list'),
+    path('report-place/', views.ReportUpload.as_view()),
 ]
 
 

@@ -1,4 +1,4 @@
-from .models import Place, Drink, Shot, Beer, Opinion, Photo
+from .models import Place, Drink, Shot, Beer, Opinion, Photo, PlaceReport
 from rest_framework import serializers
 from django.core.mail import send_mail
 # class DrinkSerializer(serializers.ModelSerializer):
@@ -67,4 +67,11 @@ class PhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Photo
         fields = "__all__"
+
+
+class PlaceReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlaceReport
+        fields = "__all__"
+
 
