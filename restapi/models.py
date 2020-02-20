@@ -54,17 +54,30 @@ class Place(models.Model):
 
 
 class OpeningHours(models.Model):
-    place = models.ForeignKey("Place", on_delete=True, related_name = '%(class)s')
-    week_day = models.IntegerField(choices=WEEKDAYS)
-    open_hours = models.TimeField()
-    close_hours = models.TimeField()
+    place = models.OneToOneField(Place, on_delete=True, related_name = 'hours', primary_key=True)
+    # week_day = models.IntegerField(choices=WEEKDAYS)
+    open_hours_monday = models.TimeField(blank=True, null=True)
+    close_hours_monday = models.TimeField(blank=True, null=True)
+    open_hours_tuesday = models.TimeField(blank=True, null=True)
+    close_hours_tuesday = models.TimeField(blank=True, null=True)
+    open_hours_wednesday = models.TimeField(blank=True, null=True)
+    close_hours_wednesday = models.TimeField(blank=True, null=True)
+    open_hours_thursday = models.TimeField(blank=True, null=True)
+    close_hours_thursday = models.TimeField(blank=True, null=True)
+    open_hours_friday = models.TimeField(blank=True, null=True)
+    close_hours_friday = models.TimeField(blank=True, null=True)
+    open_hours_saturday = models.TimeField(blank=True, null=True)
+    close_hours_saturday = models.TimeField(blank=True, null=True)
+    open_hours_sunday = models.TimeField(blank=True, null=True)
+    close_hours_sunday = models.TimeField(blank=True, null=True)
 
-    def __str__(self):
-        return str(self.place)+" "+str(self.week_day)+" "+str(self.open_hours)+" "+str(self.close_hours)
 
-    class Meta:
-        unique_together = ['place', 'week_day']
-        ordering = ['week_day']
+    # def __str__(self):
+    #     return str(self.place)+" "+str(self.week_day)+" "+str(self.open_hours)+" "+str(self.close_hours)
+
+    # class Meta:
+    #     unique_together = ['place', 'week_day']
+        # ordering = ['week_day']
     # def get_weekday_from_display(self):
     #     return DAYS[self.weekday_from]
 
