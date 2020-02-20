@@ -65,21 +65,37 @@ class PlaceFilter(FilterSet):
     def hasToBeOpenedRightNowFilter(self, queryset, name, value):
         now = datetime.datetime.now()                                               
         current_day = now.strftime("%A")                                        #current_day
-        current_time = now.time()                                               #current_time
+        current_time = now.time()                                               #current_time     
+        x=1  
+        if current_day=='Sunday':
+            x=-6
+        previous_day_number = str(int(now.strftime('%w'))-x)
+        # previous_day = datetime.datetime.strptime(previous_day_number,'%w').strftime("%A") SOMETHING IS NOT WORKING SO I HAVE TO RUB ALONG for example with tuple
+        week_day = {"0": "Sunday",
+                    "1": "Monday",
+                    "2": "Tuesday",
+                    "3": "Wednesday",
+                    "4": "Thursday",
+                    "5": "Friday",
+                    "6": "Saturday",
+                    }
+        previous_day = week_day[previous_day_number]
 
+        queryset_1 = OpeningHours.objects.filter(week_day = current_day)      #queryset filtered after current day
+        queryset_2 = OpeningHours.objects.filter(week_day = previous_day)
+        
+        query_1 = queryset_1.filter(Q(open_hours__lt = current_time) & Q(close_hours__gt = current_time),open_hours__lt = F('close_hours'))                                      #queryset filtered after first condition       
+        query_2 = queryset_1.filter(Q(open_hours__lt = current_time) & Q(open_hours__gt = F('close_hours')))                                      #queryset filtered after second condition
+        query_merged = query_1 | query_2
 
-        openinghour_queryset = OpeningHours.objects.filter(week_day = current_day)      #queryset filtered after day
-        query_time_1 = openinghour_queryset.filter(Q(open_hours__lt = current_time)
-         & Q(close_hours__gt = current_time),
-        open_hours__lt = F('close_hours'))                                      #queryset filtered after first condition       
-        query_time_2 = openinghour_queryset.filter(Q(open_hours__lt = current_time)
-         | Q(close_hours__gt = current_time),       
-        open_hours__gt = F('close_hours'))                                      #queryset filtered after second condition
-        queryset_filtered = query_time_1 | query_time_2                             #merge two querysets with time conditions
+        query_3 = queryset_2.filter(Q(close_hours__gt = current_time) & Q(open_hours__gt = F('close_hours')))
+        
+        
+        queryset_filtered = query_merged | query_3                            #merge two querysets with time conditions
         if not value:
-            queryset = queryset.exclude(opening_hours__in=queryset_filtered)
+            queryset = queryset.exclude(openinghours__in=queryset_filtered)
         else:
-            queryset = queryset.filter(opening_hours__in=queryset_filtered)
+            queryset = queryset.filter(openinghours__in=queryset_filtered)
         return queryset
 
 

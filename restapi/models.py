@@ -1,15 +1,20 @@
 from django.db import models
 from multiselectfield import MultiSelectField
 from django.core.mail import send_mail
-import calendar
 from random import randint
 from django.db.models import Count
 from django.conf import settings
 
 
-DAYS = [(day, day) for day in calendar.day_name]
-
-HOUR_OF_DAY_24 = [(i,i) for i in range(1,25)]
+WEEKDAYS = [
+  (0, "Sunday"),  
+  (1, "Monday"),
+  (2, "Tuesday"),
+  (3, "Wednesday"),
+  (4, "Thursday"),
+  (5, "Friday"),
+  (6, "Saturday"),
+]
 
 DISTRICTS = [
     ("Śródmieście", "Śródmieście"),
@@ -37,10 +42,7 @@ class Place(models.Model):
     address = models.CharField(max_length=50)
     district = models.CharField(max_length=50, choices=DISTRICTS)
     link = models.URLField(help_text="www.websiteurl.pl")
-    # open_hours = models.TimeField()
-    # close_hours = models.TimeField()
-    # week_day = MultiSelectField(choices=DAYS)
-    additionalInfo = models.CharField(max_length=500, blank=True, null=True)
+    additional_info = models.CharField(max_length=500, blank=True, null=True)
     is_updated = models.BooleanField(default=True)
 
     def __str__(self):
@@ -53,12 +55,16 @@ class Place(models.Model):
 
 class OpeningHours(models.Model):
     place = models.ForeignKey("Place", on_delete=True, related_name = '%(class)s')
-    week_day = models.CharField(choices=DAYS, max_length=50)
+    week_day = models.IntegerField(choices=WEEKDAYS)
     open_hours = models.TimeField()
     close_hours = models.TimeField()
-# input_formats=['%H:%M']
+
+    def __str__(self):
+        return str(self.place)+" "+str(self.week_day)+" "+str(self.open_hours)+" "+str(self.close_hours)
+
     class Meta:
         unique_together = ['place', 'week_day']
+        ordering = ['week_day']
     # def get_weekday_from_display(self):
     #     return DAYS[self.weekday_from]
 
@@ -66,19 +72,13 @@ class OpeningHours(models.Model):
     #     return DAYS[self.weekday_to]
 
 
-# class SpecialDays(models.Model):
-#     holiday_date = models.DateField()
-#     closed = models.BooleanField(default=True)
-#     from_hour = models.PositiveSmallIntegerField(choices=HOUR_OF_DAY_24, null=True, blank=True)
-#     to_hour = models.PositiveSmallIntegerField(choices=HOUR_OF_DAY_24, null=True, blank=True)
-
 
 class Alcohol(models.Model):
     name = models.CharField(max_length=50)
     volume = models.FloatField(blank=True, null=True)
     percentage = models.FloatField(blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
-    additionalInfo = models.CharField(max_length=300, blank=True, null=True)
+    additional_info = models.CharField(max_length=300, blank=True, null=True)
     place = models.ManyToManyField(Place, blank=False, related_name = '%(class)s')
     
     def __str__(self):
@@ -106,7 +106,7 @@ class Beverage(models.Model):
     name = models.CharField(max_length=50)
     volume = models.FloatField(blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
-    additionalInfo = models.CharField(max_length=300, blank=True, null=True)
+    additional_info = models.CharField(max_length=300, blank=True, null=True)
     place = models.ManyToManyField(Place, blank=False, related_name = 'beverage')
     
     def __str__(self):
@@ -116,7 +116,7 @@ class Beverage(models.Model):
 class Snack(models.Model):
     name = models.CharField(max_length=50)
     price = models.FloatField(blank=True, null=True)
-    additionalInfo = models.CharField(max_length=300, blank=True, null=True)
+    additional_info = models.CharField(max_length=300, blank=True, null=True)
     place = models.ManyToManyField(Place, blank=False, related_name = 'snack')
 
 
@@ -127,8 +127,8 @@ class Shop24H(models.Model):
     address = models.CharField(max_length=50)
     district = models.CharField(max_length=50, choices=DISTRICTS)
     link = models.URLField(help_text="www.websiteurl.pl")
-    week_day = MultiSelectField(choices=DAYS)
-    additionalInfo = models.CharField(max_length=500, blank=True, null=True)
+    week_day = MultiSelectField(choices=WEEKDAYS)
+    additional_info = models.CharField(max_length=500, blank=True, null=True)
 
     def __str__(self):
         return self.name
