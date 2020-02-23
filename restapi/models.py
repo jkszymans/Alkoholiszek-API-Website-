@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.safestring import mark_safe
 from multiselectfield import MultiSelectField
 from django.core.mail import send_mail
 from random import randint
@@ -147,3 +148,42 @@ class Credits(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Photo(models.Model):
+    name = models.TextField(max_length=30, default="Jazda")
+    photo_img = models.ImageField(upload_to='images/', null=True)
+    is_checked = models.BooleanField(default= False)
+
+    def image_tag(self):
+        if self.photo_img:
+            return mark_safe('<img src="%s" style="width: 100px; height:100px;" />' % self.photo_img.url)
+        else:
+            return 'No Image Found'
+
+    image_tag.short_description = 'Image'
+
+    def __str__(self):
+        return self.name
+
+
+class PlaceReport(models.Model):
+    local_name = models.ForeignKey("Place",
+                                    on_delete=models.CASCADE,
+                                    related_name='%(class)s',
+                                  )
+    description = models.TextField(max_length=255)
+    report_image = models.ImageField(null=True, upload_to='reports/')
+    signature = models.CharField(max_length=20)
+    is_checked = models.BooleanField(default= False)
+
+    def image_tag(self):
+        if self.report_image:
+            return mark_safe('<img src="%s" style="width: 200px; height:200px;" />' % self.report_image.url)
+        else:
+            return 'No Image Found'
+
+    image_tag.short_description = 'Report'
+
+    def __str__(self):
+        return self.description
