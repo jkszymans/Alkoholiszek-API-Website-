@@ -25,7 +25,6 @@ class PlaceFilter(FilterSet):
     maxShotPrice = filters.NumberFilter(field_name='shot__price', lookup_expr='lte')
     maxBeerPrice = filters.NumberFilter(field_name='beer__price', lookup_expr='lte')
     hasToBeOpenedRightNow = filters.BooleanFilter(method='hasToBeOpenedRightNowFilter')
-    # openedAtGivenHour = filters.CharFilter(method='openedAtGivenHourFilter')
 
 
     class Meta:
@@ -33,26 +32,27 @@ class PlaceFilter(FilterSet):
         fields = ('district','areThereDrinks','areThereBeers',
         'areThereShots','maxDrinkPrice', 'maxBeerPrice',
         'maxShotPrice', 'hasToBeOpenedRightNow')
-        # 'openedAtGivenHour')
+
+
 
     def hasToBeOpenedRightNowFilter(self, queryset, name, value):
         now = datetime.datetime.now()                                               
-        current_day = int(now.strftime("%w"))                                        #current_day A
-        current_time = now.time()                                               #current_time     
+        current_day = int(now.strftime("%w"))
+        current_time = now.time()
         x=1  
-        if current_day=='Sunday':
+        if current_day=='Sunday':                   #Sunday=0 , so we can't substract 1 because it will be -1. Weekdays starts at 0(sunday) and end on 6(saturday)
             x=-6
         previous_day = str(int(now.strftime('%w'))-x)
 
 
-        queryset_1 = OpeningHours.objects.filter(week_day = current_day)      #queryset filtered after current day
-        queryset_2 = OpeningHours.objects.filter(week_day = previous_day)
+        queryset_1 = OpeningHours.objects.filter(week_day = current_day)            #Getting the current day opening hours
+        queryset_2 = OpeningHours.objects.filter(week_day = previous_day)           #We need to remember that Place can be open to the next day hours(for example 20--04 and it can be 03 now) so we need to check previous day hours
         
-        query_1 = queryset_1.filter(Q(open_hours__lt = current_time) & Q(close_hours__gt = current_time),open_hours__lt = F('close_hours'))              #queryset filtered after first condition       
-        query_2 = queryset_1.filter(Q(open_hours__lt = current_time) & Q(open_hours__gt = F('close_hours')))                                      #queryset filtered after second condition
-        query_merged = query_1 | query_2
+        query_1 = queryset_1.filter(Q(open_hours__lt = current_time) & Q(close_hours__gt = current_time),open_hours__lt = F('close_hours'))              #queryset filtered in case open hours are less than close hours(for example 10--22) 
+        query_2 = queryset_1.filter(Q(open_hours__lt = current_time) & Q(open_hours__gt = F('close_hours')))                                      #queryset filtered in case current time is beetwen open hours and midnight and close hour are less than open hours(22--04)
+        query_merged = query_1 | query_2    #merging 2 querysets from above
 
-        query_3 = queryset_2.filter(Q(close_hours__gt = current_time) & Q(open_hours__gt = F('close_hours')))
+        query_3 = queryset_2.filter(Q(close_hours__gt = current_time) & Q(open_hours__gt = F('close_hours'))) #This time we check if we does not hit previous day close hours
         
         
         queryset_filtered = query_merged | query_3                            #merge two querysets with time conditions
@@ -63,8 +63,6 @@ class PlaceFilter(FilterSet):
         return queryset
 
 
-    # def openedAtGivenHour(self, queryset, name, value):
-    #     pass
 
 class PlaceList(generics.ListAPIView):
     serializer_class = PlaceListSerializer
@@ -130,44 +128,3 @@ class CreditsList(generics.ListCreateAPIView):
     queryset = Credits.objects.all()
     serializer_class = CreditsSerializer
 
-
-
-        
-# @api_view(['GET', 'POST'])
-# def place_list(request, format=None):
-#     if request.method == 'GET':
-#         place = Place.objects.all()
-#         serializer = PlaceListSerializer(place, many=True)
-#         return Response(serializer.data)
-
-#     elif request.method == 'POST':
-#         serializer = PlaceListSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# @api_view(['GET', 'PUT', 'DELETE'])
-# def place_detail(request, id, format=None):
-#     try:
-#         place = Place.objects.get(id=id)
-
-#     except Place.DoesNotExist:
-#         return Response(status=status.HTTP_404_NOT_FOUND)
-
-#     if request.method == 'GET':
-#         serializer = PlaceDetailSerializer(place)
-#         return Response(serializer.data)
-
-#     elif request.method == 'PUT':
-#         data = JSONParser().parse(request)
-#         serializer = PlaceDetailSerializer(place, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#     elif request.method == 'DELETE':
-#         place.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -28,15 +28,7 @@ DISTRICTS = [
 ]
 
 
-# class PlaceManager(models.Manager):
-#     def random(self):
-#         count = self.aggregate(count=Count('id'))['count']
-#         random_index = randint(0, count - 1)
-#         return self.all()[random_index]
-
-
 class Place(models.Model):
-    # objects = PlaceManager()
     name = models.CharField(max_length=50)
     lat = models.FloatField()
     lng = models.FloatField()
@@ -66,12 +58,6 @@ class OpeningHours(models.Model):
     class Meta:
         unique_together = ['place', 'week_day']
         ordering = ['place','week_day']
-
-    # def get_weekday_from_display(self):
-    #     return DAYS[self.weekday_from]
-
-    # def get_weekday_to_display(self):
-    #     return DAYS[self.weekday_to]
 
 
 def create_weekday(sender, instance, **kwargs):
@@ -153,7 +139,6 @@ class Opinion(models.Model):
         message = self.opinion_text
         from_email = settings.EMAIL_HOST_USER
         recipient_list = ['jkszymans@gmail.com']
-        # html_mes = 'to jest w html'
         send_mail(subject, message, from_email, recipient_list)
 
 

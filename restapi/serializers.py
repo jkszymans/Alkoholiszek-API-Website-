@@ -39,10 +39,6 @@ class PlaceDetailSerializer(serializers.ModelSerializer):
 
     def get_open_close_hours(self, plaace):
         hours = plaace.hours.values()
-        # ('open_hours_monday','close_hours_monday','open_hours_tuesday','close_hours_tuesday',
-        # 'open_hours_wednesday','close_hours_wednesday','open_hours_thursday','close_hours_thursday',
-        # 'open_hours_friday','close_hours_friday','open_hours_saturday','close_hours_saturday',
-        # 'open_hours_sunday','close_hours_sunday')
         return hours
 
 
@@ -56,6 +52,7 @@ class OpinionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Opinion
         fields = '__all__'
+    
     
 class CreditsSerializer(serializers.ModelSerializer):
     class Meta:
