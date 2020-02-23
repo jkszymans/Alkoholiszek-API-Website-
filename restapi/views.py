@@ -1,11 +1,15 @@
 from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import JSONParser
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework import status, generics
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
-from .models import Place, Shot, Drink, Beer, Opinion, OpeningHours, Credits
-from .serializers import PlaceDetailSerializer, PlaceListSerializer, OpinionSerializer, CreditsSerializer
+from .models import Place, Shot, Drink, Beer, Opinion, OpeningHours, Credits, Photo, PlaceReport
+from .serializers import PlaceDetailSerializer, PlaceListSerializer, OpinionSerializer, CreditsSerializer, PhotoSerializer, PlaceReportSerializer
+from rest_framework.views import APIView
+from rest_framework.parsers import FileUploadParser
+from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter 
 from django_filters import FilterSet
@@ -82,6 +86,10 @@ class PlaceDetail(generics.RetrieveAPIView):
     queryset = Place.objects.all()
 
 
+class PhotoDetail(generics.RetrieveAPIView):
+    serializer_class = PhotoSerializer
+    queryset = Photo.objects.all()
+
 
 @api_view(['GET'])
 def place_random(request, format=None):
@@ -124,7 +132,83 @@ def report_place(request,format=None):
         return Response(serializer.data)
 
 
+<<<<<<< HEAD
 class CreditsList(generics.ListCreateAPIView):
     queryset = Credits.objects.all()
     serializer_class = CreditsSerializer
+=======
+        
+# @api_view(['GET', 'POST'])
+# def place_list(request, format=None):
+#     if request.method == 'GET':
+#         place = Place.objects.all()
+#         serializer = PlaceListSerializer(place, many=True)
+#         return Response(serializer.data)
+
+#     elif request.method == 'POST':
+#         serializer = PlaceListSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# @api_view(['GET', 'PUT', 'DELETE'])
+# def place_detail(request, id, format=None):
+#     try:
+#         place = Place.objects.get(id=id)
+
+#     except Place.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
+
+#     if request.method == 'GET':
+#         serializer = PlaceDetailSerializer(place)
+#         return Response(serializer.data)
+
+#     elif request.method == 'PUT':
+#         data = JSONParser().parse(request)
+#         serializer = PlaceDetailSerializer(place, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     elif request.method == 'DELETE':
+#         place.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+class PhotoUploadView(APIView):
+    parser_class = (FileUploadParser,)
+
+    def post(self, request, *args, **kwargs):
+
+        photo_serializer = PhotoSerializer(data=request.data)
+        if photo_serializer.is_valid():
+            photo_serializer.save()
+            return Response(photo_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(photo_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def PhotoList(request):
+      images = Photo.objects.all()
+      return render(request, "photos.html", {'images': images})
+
+
+class ReportUpload(APIView):
+    parser_class = (FileUploadParser,)
+
+    def post(self, request, *args, **kwargs):
+
+        report_serializer = PlaceReportSerializer(data=request.data)
+        if report_serializer.is_valid():
+            report_serializer.save()
+            return Response(report_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(report_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+>>>>>>> c7ddbfdd6c52decb9671349bd51d1c8bb2b0b334
 
