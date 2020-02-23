@@ -18,12 +18,12 @@ from django.db.models import Count
 
 class PlaceFilter(FilterSet):
     district = filters.CharFilter('district')
-    areThereDrinks = filters.BooleanFilter(method='areThereDrinksFilter')
-    areThereBeers = filters.BooleanFilter(method='areThereBeersFilter')
-    areThereShots = filters.BooleanFilter(method='areThereShotsFilter')
-    maxDrinkPrice = filters.NumberFilter(method='maxDrinkPriceFilter')
-    maxShotPrice = filters.NumberFilter(method='maxShotPriceFilter')
-    maxBeerPrice = filters.NumberFilter(method='maxBeerPriceFilter')
+    areThereDrinks = filters.BooleanFilter(field_name='drink', lookup_expr='isnull', exclude=True)
+    areThereBeers = filters.BooleanFilter(field_name='beer', lookup_expr='isnull', exclude=True)
+    areThereShots = filters.BooleanFilter(field_name='shot', lookup_expr='isnull', exclude=True)
+    maxDrinkPrice = filters.NumberFilter(field_name='drink__price', lookup_expr='lte')
+    maxShotPrice = filters.NumberFilter(field_name='shot__price', lookup_expr='lte')
+    maxBeerPrice = filters.NumberFilter(field_name='beer__price', lookup_expr='lte')
     hasToBeOpenedRightNow = filters.BooleanFilter(method='hasToBeOpenedRightNowFilter')
     # openedAtGivenHour = filters.CharFilter(method='openedAtGivenHourFilter')
 
@@ -35,51 +35,31 @@ class PlaceFilter(FilterSet):
         'maxShotPrice', 'hasToBeOpenedRightNow')
         # 'openedAtGivenHour')
 
-    def areThereDrinksFilter(self, queryset, name, value):
-        queryset = queryset.exclude(drink__isnull=value)
-        return queryset
-
-    def areThereBeersFilter(self, queryset, name, value):
-        queryset = queryset.exclude(beer__isnull=value)
-        return queryset
-
-    def areThereShotsFilter(self, queryset, name, value):
-        queryset = queryset.exclude(shot__isnull=value)
-        return queryset
-        
-    def maxDrinkPriceFilter(self, queryset, name, value):
-        drink_queryset = Drink.objects.filter(price__lte=value)
-        queryset = queryset.filter(drink__in=drink_queryset)
-        return queryset
-
-    def maxShotPriceFilter(self, queryset, name, value):
-        shot_queryset = Shot.objects.filter(price__lte=value)
-        queryset = queryset.filter(shot__in=shot_queryset)
-        return queryset
-
-    def maxBeerPriceFilter(self, queryset, name, value):
-        beer_queryset = Beer.objects.filter(price__lte=value)
-        queryset = queryset.filter(beer__in=beer_queryset)
-        return queryset
-
     def hasToBeOpenedRightNowFilter(self, queryset, name, value):
         now = datetime.datetime.now()                                               
-        current_day = now.strftime("%A")                                        #current_day
-        current_time = now.time()                                               #current_time
+        current_day = int(now.strftime("%w"))                                        #current_day A
+        current_time = now.time()                                               #current_time     
+        x=1  
+        if current_day=='Sunday':
+            x=-6
+        previous_day = str(int(now.strftime('%w'))-x)
 
 
-        openinghour_queryset = OpeningHours.objects.filter(week_day = current_day)      #queryset filtered after day
-        query_time_1 = openinghour_queryset.filter(Q(open_hours__lt = current_time)
-         & Q(close_hours__gt = current_time),
-        open_hours__lt = F('close_hours'))                                      #queryset filtered after first condition       
-        query_time_2 = openinghour_queryset.filter(Q(open_hours__lt = current_time)
-         | Q(close_hours__gt = current_time),       
-        open_hours__gt = F('close_hours'))                                      #queryset filtered after second condition
-        queryset_filtered = query_time_1 | query_time_2                             #merge two querysets with time conditions
+        queryset_1 = OpeningHours.objects.filter(week_day = current_day)      #queryset filtered after current day
+        queryset_2 = OpeningHours.objects.filter(week_day = previous_day)
+        
+        query_1 = queryset_1.filter(Q(open_hours__lt = current_time) & Q(close_hours__gt = current_time),open_hours__lt = F('close_hours'))              #queryset filtered after first condition       
+        query_2 = queryset_1.filter(Q(open_hours__lt = current_time) & Q(open_hours__gt = F('close_hours')))                                      #queryset filtered after second condition
+        query_merged = query_1 | query_2
+
+        query_3 = queryset_2.filter(Q(close_hours__gt = current_time) & Q(open_hours__gt = F('close_hours')))
+        
+        
+        queryset_filtered = query_merged | query_3                            #merge two querysets with time conditions
         if not value:
-            queryset = queryset.exclude(opening_hours__in=queryset_filtered)
+            queryset = queryset.exclude(openinghours__in=queryset_filtered)
         else:
-            queryset = queryset.filter(opening_hours__in=queryset_filtered)
+            queryset = queryset.filter(openinghours__in=queryset_filtered)
         return queryset
 
 
