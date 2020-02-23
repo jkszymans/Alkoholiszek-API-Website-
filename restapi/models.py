@@ -66,6 +66,7 @@ class OpeningHours(models.Model):
     class Meta:
         unique_together = ['place', 'week_day']
         ordering = ['place','week_day']
+
     # def get_weekday_from_display(self):
     #     return DAYS[self.weekday_from]
 
