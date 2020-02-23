@@ -4,6 +4,7 @@ from django.core.mail import send_mail
 from random import randint
 from django.db.models import Count
 from django.conf import settings
+from django.db.models.signals import post_save
 
 
 WEEKDAYS = [
@@ -54,36 +55,33 @@ class Place(models.Model):
 
 
 class OpeningHours(models.Model):
-    place = models.OneToOneField(Place, on_delete=True, related_name = 'hours', primary_key=True)
-    # week_day = models.IntegerField(choices=WEEKDAYS)
-    open_hours_monday = models.TimeField(blank=True, null=True)
-    close_hours_monday = models.TimeField(blank=True, null=True)
-    open_hours_tuesday = models.TimeField(blank=True, null=True)
-    close_hours_tuesday = models.TimeField(blank=True, null=True)
-    open_hours_wednesday = models.TimeField(blank=True, null=True)
-    close_hours_wednesday = models.TimeField(blank=True, null=True)
-    open_hours_thursday = models.TimeField(blank=True, null=True)
-    close_hours_thursday = models.TimeField(blank=True, null=True)
-    open_hours_friday = models.TimeField(blank=True, null=True)
-    close_hours_friday = models.TimeField(blank=True, null=True)
-    open_hours_saturday = models.TimeField(blank=True, null=True)
-    close_hours_saturday = models.TimeField(blank=True, null=True)
-    open_hours_sunday = models.TimeField(blank=True, null=True)
-    close_hours_sunday = models.TimeField(blank=True, null=True)
+    place = models.ForeignKey("Place", on_delete=models.CASCADE, related_name = '%(class)s')
+    week_day = models.IntegerField(choices=WEEKDAYS)
+    open_hours = models.TimeField(blank=True, null=True)
+    close_hours = models.TimeField(blank=True, null=True)
 
+    def __str__(self):
+        return str(self.place)+" "+str(self.week_day)
 
-    # def __str__(self):
-    #     return str(self.place)+" "+str(self.week_day)+" "+str(self.open_hours)+" "+str(self.close_hours)
+    class Meta:
+        unique_together = ['place', 'week_day']
+        ordering = ['place','week_day']
 
-    # class Meta:
-    #     unique_together = ['place', 'week_day']
-        # ordering = ['week_day']
     # def get_weekday_from_display(self):
     #     return DAYS[self.weekday_from]
 
     # def get_weekday_to_display(self):
     #     return DAYS[self.weekday_to]
 
+
+def create_weekday(sender, instance, **kwargs):
+    for i in range(0,7):
+        inst_hours = OpeningHours()
+        inst_hours.week_day=i
+        inst_hours.place=instance
+        inst_hours.save()
+
+post_save.connect(create_weekday, sender=Place)
 
 
 class Alcohol(models.Model):
