@@ -38,7 +38,7 @@ class PlaceDetailSerializer(serializers.ModelSerializer):
         return snacks
 
     def get_open_close_hours(self, plaace):
-        hours = plaace.openinghours.values()
+        hours = plaace.openinghours.values('week_day', 'open_hours', 'close_hours')
         return hours
 
 
