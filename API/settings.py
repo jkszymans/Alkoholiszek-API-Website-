@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'django_filters',
     'multiselectfield',
     'mysite',
+    'register',
 ]
 
 MIDDLEWARE = [

@@ -132,50 +132,10 @@ def report_place(request,format=None):
         return Response(serializer.data)
 
 
-<<<<<<< HEAD
+
 class CreditsList(generics.ListCreateAPIView):
     queryset = Credits.objects.all()
     serializer_class = CreditsSerializer
-=======
-        
-# @api_view(['GET', 'POST'])
-# def place_list(request, format=None):
-#     if request.method == 'GET':
-#         place = Place.objects.all()
-#         serializer = PlaceListSerializer(place, many=True)
-#         return Response(serializer.data)
-
-#     elif request.method == 'POST':
-#         serializer = PlaceListSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# @api_view(['GET', 'PUT', 'DELETE'])
-# def place_detail(request, id, format=None):
-#     try:
-#         place = Place.objects.get(id=id)
-
-#     except Place.DoesNotExist:
-#         return Response(status=status.HTTP_404_NOT_FOUND)
-
-#     if request.method == 'GET':
-#         serializer = PlaceDetailSerializer(place)
-#         return Response(serializer.data)
-
-#     elif request.method == 'PUT':
-#         data = JSONParser().parse(request)
-#         serializer = PlaceDetailSerializer(place, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#     elif request.method == 'DELETE':
-#         place.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 
@@ -190,6 +150,7 @@ class PhotoUploadView(APIView):
             return Response(photo_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(photo_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 def PhotoList(request):
@@ -208,7 +169,4 @@ class ReportUpload(APIView):
             return Response(report_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(report_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
->>>>>>> c7ddbfdd6c52decb9671349bd51d1c8bb2b0b334
 

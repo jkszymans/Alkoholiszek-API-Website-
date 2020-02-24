@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-from .models import Place, Drink, Shot, Beer, Opinion, Credits, OpeningHours
-=======
-from .models import Place, Drink, Shot, Beer, Opinion, Photo, PlaceReport
->>>>>>> c7ddbfdd6c52decb9671349bd51d1c8bb2b0b334
+from .models import Place, Drink, Shot, Beer, Opinion, Credits, OpeningHours, Photo, PlaceReport
 from rest_framework import serializers
 from django.core.mail import send_mail
 
@@ -17,14 +13,9 @@ class PlaceDetailSerializer(serializers.ModelSerializer):
     open_close_hours = serializers.SerializerMethodField('get_open_close_hours')
     class Meta:
         model = Place
-<<<<<<< HEAD
         fields = ('id','name', 'lat', 'lng', 'address', 'district', 'link',
          'additional_info', 'drinks', 'beers', 'shots', 'beverages', 'snacks',
           'open_close_hours')
-=======
-        fields = ('name', 'lat', 'lng', 'address', 'district', 'link',
-         'additionalInfo', 'drinks', 'beers', 'shots', 'beverages', 'snacks')
->>>>>>> c7ddbfdd6c52decb9671349bd51d1c8bb2b0b334
 
     def get_drink_data(self, plaace):
         drinks = plaace.drink.values('name', 'volume', 'percentage', 'price', 'additional_info')
