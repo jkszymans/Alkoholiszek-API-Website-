@@ -1,22 +1,7 @@
-from .models import Place, Drink, Shot, Beer, Opinion
+from .models import Place, Drink, Shot, Beer, Opinion, Credits, OpeningHours, Photo, PlaceReport
 from rest_framework import serializers
 from django.core.mail import send_mail
-# class DrinkSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Drink
-#         fields = ('name', 'volume', 'percentage', 'price', 'additionalInfo')
 
-
-# class ShotSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Shot
-#         fields = ('name', 'volume', 'percentage', 'price', 'additionalInfo')
-
-
-# class BeerSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Beer
-#         fields = ('name', 'volume', 'percentage', 'price', 'additionalInfo')
 
 
 class PlaceDetailSerializer(serializers.ModelSerializer):
@@ -25,30 +10,36 @@ class PlaceDetailSerializer(serializers.ModelSerializer):
     shots = serializers.SerializerMethodField('get_shot_data')
     beverages = serializers.SerializerMethodField('get_beverage_data')
     snacks = serializers.SerializerMethodField('get_snack_data')
+    open_close_hours = serializers.SerializerMethodField('get_open_close_hours')
     class Meta:
         model = Place
         fields = ('id','name', 'lat', 'lng', 'address', 'district', 'link',
-         'additionalInfo', 'drinks', 'beers', 'shots', 'beverages', 'snacks')
+         'additional_info', 'drinks', 'beers', 'shots', 'beverages', 'snacks',
+          'open_close_hours')
 
     def get_drink_data(self, plaace):
-        drinks = plaace.drink.values('name', 'volume', 'percentage', 'price', 'additionalInfo')
+        drinks = plaace.drink.values('name', 'volume', 'percentage', 'price', 'additional_info')
         return drinks
 
     def get_beer_data(self, plaace):
-        beers = plaace.beer.values('name', 'volume', 'percentage', 'price', 'additionalInfo')
+        beers = plaace.beer.values('name', 'volume', 'percentage', 'price', 'additional_info')
         return beers
 
     def get_shot_data(self, plaace):
-        shots = plaace.shot.values('name', 'volume', 'percentage', 'price', 'additionalInfo')
+        shots = plaace.shot.values('name', 'volume', 'percentage', 'price', 'additional_info')
         return shots
 
     def get_beverage_data(self, plaace):
-        beverages = plaace.beverage.values('name', 'volume', 'price', 'additionalInfo')
+        beverages = plaace.beverage.values('name', 'volume', 'price', 'additional_info')
         return beverages
 
     def get_snack_data(self, plaace):
-        snacks = plaace.snack.values('name', 'price', 'additionalInfo')
+        snacks = plaace.snack.values('name', 'price', 'additional_info')
         return snacks
+
+    def get_open_close_hours(self, plaace):
+        hours = plaace.hours.values()
+        return hours
 
 
 class PlaceListSerializer(serializers.ModelSerializer):
@@ -62,3 +53,22 @@ class OpinionSerializer(serializers.ModelSerializer):
         model = Opinion
         fields = '__all__'
     
+    
+class CreditsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Credits
+        fields = '__all__'
+
+
+class PhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Photo
+        fields = "__all__"
+
+
+class PlaceReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlaceReport
+        fields = "__all__"
+
+

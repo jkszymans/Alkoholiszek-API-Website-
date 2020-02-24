@@ -1,7 +1,6 @@
 import os
 import secret
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = secret.SECRET_KEY
@@ -22,6 +21,7 @@ INSTALLED_APPS = [
     'django_filters',
     'multiselectfield',
     'mysite',
+    'register',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +55,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'API.wsgi.application'
 
-DATABASES = secret.DATABASES
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -93,6 +98,10 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
 REST_FRAMEWORK = {
     'SEARCH_PARAM': 'specificName'
 }
@@ -103,3 +112,5 @@ EMAIL_USE_SSL = True
 EMAIL_PORT = 465
 EMAIL_HOST_USER = secret.EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = secret.EMAIL_HOST_PASSWORD
+
+

@@ -1,10 +1,38 @@
 <!DOCTYPE html>
+{% extends 'base.html' %}
+{% load static from staticfiles %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>$Title$</title>
 </head>
 <body>
-$END$
+ {% block content %}
+    <h1>REGISTRATION PAGE</h1>
+    <div class="content">
+        <form method="POST" >
+            {% csrf_token %}
+            <h4>First Name</h4>
+            <input type="text" name="first_name" placeholder="First Name"><br>
+            <h4>Last Name</h4>
+            <input type="text" name="last_name" placeholder="Last Name"><br>
+            <h4>Username</h4>
+             <input type="text" name="username" placeholder="userame"><br>
+            <h4>Email</h4>
+            <input type="email" name="email" placeholder="Email"><br>
+            <h4>Password</h4>
+            <input type="password" name="password1" placeholder="password"><br>
+            <h4>Confirm Password</h4>
+            <input type="password" name="password2" placeholder="Confirm password"><br>
+            <button type="submit" class="btn btn-success">Register</button>
+        </form>
+             {% for message in messages %}
+            <h3>{{message}}</h3>
+            {% endfor %}
+        </div>
+
+
+
+    {% endblock %}
 </body>
 </html>

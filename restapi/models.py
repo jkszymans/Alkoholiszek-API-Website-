@@ -1,15 +1,22 @@
 from django.db import models
+from django.utils.safestring import mark_safe
 from multiselectfield import MultiSelectField
 from django.core.mail import send_mail
-import calendar
 from random import randint
 from django.db.models import Count
 from django.conf import settings
+from django.db.models.signals import post_save
 
 
-DAYS = [(day, day) for day in calendar.day_name]
-
-HOUR_OF_DAY_24 = [(i,i) for i in range(1,25)]
+WEEKDAYS = [
+  (0, "Sunday"),  
+  (1, "Monday"),
+  (2, "Tuesday"),
+  (3, "Wednesday"),
+  (4, "Thursday"),
+  (5, "Friday"),
+  (6, "Saturday"),
+]
 
 DISTRICTS = [
     ("Śródmieście", "Śródmieście"),
@@ -22,25 +29,14 @@ DISTRICTS = [
 ]
 
 
-# class PlaceManager(models.Manager):
-#     def random(self):
-#         count = self.aggregate(count=Count('id'))['count']
-#         random_index = randint(0, count - 1)
-#         return self.all()[random_index]
-
-
 class Place(models.Model):
-    # objects = PlaceManager()
     name = models.CharField(max_length=50)
     lat = models.FloatField()
     lng = models.FloatField()
     address = models.CharField(max_length=50)
     district = models.CharField(max_length=50, choices=DISTRICTS)
     link = models.URLField(help_text="www.websiteurl.pl")
-    # open_hours = models.TimeField()
-    # close_hours = models.TimeField()
-    # week_day = MultiSelectField(choices=DAYS)
-    additionalInfo = models.CharField(max_length=500, blank=True, null=True)
+    additional_info = models.CharField(max_length=500, blank=True, null=True)
     is_updated = models.BooleanField(default=True)
 
     def __str__(self):
@@ -52,25 +48,27 @@ class Place(models.Model):
 
 
 class OpeningHours(models.Model):
-    place = models.ForeignKey("Place", on_delete=True, related_name = '%(class)s')
-    week_day = models.CharField(choices=DAYS, max_length=50)
-    open_hours = models.TimeField()
-    close_hours = models.TimeField()
-# input_formats=['%H:%M']
+    place = models.ForeignKey("Place", on_delete=models.CASCADE, related_name = '%(class)s')
+    week_day = models.IntegerField(choices=WEEKDAYS)
+    open_hours = models.TimeField(blank=True, null=True)
+    close_hours = models.TimeField(blank=True, null=True)
+
+    def __str__(self):
+        return str(self.place)+" "+str(self.week_day)
+
     class Meta:
         unique_together = ['place', 'week_day']
-    # def get_weekday_from_display(self):
-    #     return DAYS[self.weekday_from]
-
-    # def get_weekday_to_display(self):
-    #     return DAYS[self.weekday_to]
+        ordering = ['place','week_day']
 
 
-# class SpecialDays(models.Model):
-#     holiday_date = models.DateField()
-#     closed = models.BooleanField(default=True)
-#     from_hour = models.PositiveSmallIntegerField(choices=HOUR_OF_DAY_24, null=True, blank=True)
-#     to_hour = models.PositiveSmallIntegerField(choices=HOUR_OF_DAY_24, null=True, blank=True)
+def create_weekday(sender, instance, **kwargs):
+    for i in range(0,7):
+        inst_hours = OpeningHours()
+        inst_hours.week_day=i
+        inst_hours.place=instance
+        inst_hours.save()
+
+post_save.connect(create_weekday, sender=Place)
 
 
 class Alcohol(models.Model):
@@ -78,7 +76,7 @@ class Alcohol(models.Model):
     volume = models.FloatField(blank=True, null=True)
     percentage = models.FloatField(blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
-    additionalInfo = models.CharField(max_length=300, blank=True, null=True)
+    additional_info = models.CharField(max_length=300, blank=True, null=True)
     place = models.ManyToManyField(Place, blank=False, related_name = '%(class)s')
     
     def __str__(self):
@@ -106,7 +104,7 @@ class Beverage(models.Model):
     name = models.CharField(max_length=50)
     volume = models.FloatField(blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
-    additionalInfo = models.CharField(max_length=300, blank=True, null=True)
+    additional_info = models.CharField(max_length=300, blank=True, null=True)
     place = models.ManyToManyField(Place, blank=False, related_name = 'beverage')
     
     def __str__(self):
@@ -116,7 +114,7 @@ class Beverage(models.Model):
 class Snack(models.Model):
     name = models.CharField(max_length=50)
     price = models.FloatField(blank=True, null=True)
-    additionalInfo = models.CharField(max_length=300, blank=True, null=True)
+    additional_info = models.CharField(max_length=300, blank=True, null=True)
     place = models.ManyToManyField(Place, blank=False, related_name = 'snack')
 
 
@@ -127,8 +125,8 @@ class Shop24H(models.Model):
     address = models.CharField(max_length=50)
     district = models.CharField(max_length=50, choices=DISTRICTS)
     link = models.URLField(help_text="www.websiteurl.pl")
-    week_day = MultiSelectField(choices=DAYS)
-    additionalInfo = models.CharField(max_length=500, blank=True, null=True)
+    week_day = MultiSelectField(choices=WEEKDAYS)
+    additional_info = models.CharField(max_length=500, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -142,7 +140,50 @@ class Opinion(models.Model):
         message = self.opinion_text
         from_email = settings.EMAIL_HOST_USER
         recipient_list = ['jkszymans@gmail.com']
-        # html_mes = 'to jest w html'
         send_mail(subject, message, from_email, recipient_list)
 
 
+class Credits(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+class Photo(models.Model):
+    name = models.TextField(max_length=30, default="Jazda")
+    photo_img = models.ImageField(upload_to='images/', null=True)
+    is_checked = models.BooleanField(default= False)
+
+    def image_tag(self):
+        if self.photo_img:
+            return mark_safe('<img src="%s" style="width: 100px; height:100px;" />' % self.photo_img.url)
+        else:
+            return 'No Image Found'
+
+    image_tag.short_description = 'Image'
+
+    def __str__(self):
+        return self.name
+
+
+class PlaceReport(models.Model):
+    local_name = models.ForeignKey("Place",
+                                    on_delete=models.CASCADE,
+                                    related_name='%(class)s',
+                                  )
+    description = models.TextField(max_length=255)
+    report_image = models.ImageField(null=True, upload_to='reports/')
+    signature = models.CharField(max_length=20)
+    is_checked = models.BooleanField(default= False)
+
+    def image_tag(self):
+        if self.report_image:
+            return mark_safe('<img src="%s" style="width: 200px; height:200px;" />' % self.report_image.url)
+        else:
+            return 'No Image Found'
+
+    image_tag.short_description = 'Report'
+
+    def __str__(self):
+        return self.description
