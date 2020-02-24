@@ -42,9 +42,11 @@ class PlaceFilter(FilterSet):
     def hasToBeOpenedRightNowFilter(self, queryset, name, value):
         now = datetime.datetime.now()                                               
         current_day = int(now.strftime("%w"))
+        if current_day==0           #In datetime module Sunday is 0(I want Sunday to be 7)
+            current_day=7
         current_time = now.time()
         x=1  
-        if current_day=='Sunday':                   #Sunday=0 , so we can't substract 1 because it will be -1. Weekdays starts at 0(sunday) and end on 6(saturday)
+        if current_day=='1':                   #Monday=0 , so we can't substract 1 because it will be 0. Weekdays starts at 1(Monday) and end on 7(Sunday)
             x=-6
         previous_day = str(int(now.strftime('%w'))-x)
 
