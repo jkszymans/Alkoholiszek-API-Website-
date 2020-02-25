@@ -6,7 +6,7 @@ from random import randint
 from django.db.models import Count
 from django.conf import settings
 from django.db.models.signals import post_save
-
+from django.core.validators import int_list_validator
 
 WEEKDAYS = [
   (1, "Monday"),
@@ -150,10 +150,23 @@ class Credits(models.Model):
         return self.name
 
 
-class Photo(models.Model):
-    name = models.TextField(max_length=30, default="Jazda")
-    photo_img = models.ImageField(upload_to='images/', null=True)
+class PlaceReport(models.Model):
+    place_name = models.ForeignKey("Place",
+                                    on_delete=models.CASCADE,
+                                    related_name='%(class)s',
+                                  )
+    description = models.TextField(max_length=400)
+    photo_id_list = models.CharField(validators=[int_list_validator], max_length=10)  
+    signature = models.CharField(max_length=20, blank=True, null=True)
     is_checked = models.BooleanField(default= False)
+
+    def __str__(self):
+        return self.local_name+" "+self.description
+
+
+class Photo(models.Model):
+    name = models.CharField(max_length=50)
+    photo_img = models.ImageField(upload_to='images/', null=True)
 
     def image_tag(self):
         if self.photo_img:
@@ -165,25 +178,3 @@ class Photo(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class PlaceReport(models.Model):
-    local_name = models.ForeignKey("Place",
-                                    on_delete=models.CASCADE,
-                                    related_name='%(class)s',
-                                  )
-    description = models.TextField(max_length=255)
-    report_image = models.ImageField(null=True, upload_to='reports/')
-    signature = models.CharField(max_length=20)
-    is_checked = models.BooleanField(default= False)
-
-    def image_tag(self):
-        if self.report_image:
-            return mark_safe('<img src="%s" style="width: 200px; height:200px;" />' % self.report_image.url)
-        else:
-            return 'No Image Found'
-
-    image_tag.short_description = 'Report'
-
-    def __str__(self):
-        return self.description
