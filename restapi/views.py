@@ -5,8 +5,8 @@ from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework import status, generics
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
-from .models import Place, Shot, Drink, Beer, Opinion, OpeningHours, Credits, Photo, PlaceReport
-from .serializers import PlaceDetailSerializer, PlaceListSerializer, OpinionSerializer, CreditsSerializer, PhotoSerializer, PlaceReportSerializer
+from .models import *
+from .serializers import *
 from rest_framework.views import APIView
 from rest_framework.parsers import FileUploadParser
 from rest_framework.viewsets import ModelViewSet
@@ -160,11 +160,8 @@ def PhotoList(request):
       return render(request, "photos.html", {'images': images})
 
 
-class ReportUpload(APIView):
-    parser_class = (FileUploadParser,)
-
+class ReportPlaceView(APIView):
     def post(self, request, *args, **kwargs):
-
         report_serializer = PlaceReportSerializer(data=request.data)
         if report_serializer.is_valid():
             report_serializer.save()
@@ -172,3 +169,12 @@ class ReportUpload(APIView):
         else:
             return Response(report_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class PlaceSubmitView(APIView):
+    def post(self, request, *args, **kwargs):
+        report_serializer = PlaceSubmitSerializer(data=request.data)
+        if report_serializer.is_valid():
+            report_serializer.save()
+            return Response(report_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(report_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

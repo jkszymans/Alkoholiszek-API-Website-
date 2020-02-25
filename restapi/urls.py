@@ -10,7 +10,8 @@ urlpatterns = [
     path('credits', views.CreditsList.as_view(), name='credits_list'),
     path('images/', views.PhotoUploadView.as_view()),
     path('images/all/', views.PhotoList, name='list'),
-    path('report-place/', views.ReportUpload.as_view()),
+    path('report-place/', views.ReportPlaceView.as_view()),
+    path('submit-place/', views.PlaceSubmitView.as_view()),
 ]
 
 

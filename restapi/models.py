@@ -151,7 +151,7 @@ class Credits(models.Model):
 
 
 class PlaceReport(models.Model):
-    place_name = models.ForeignKey("Place",
+    place = models.ForeignKey("Place",
                                     on_delete=models.CASCADE,
                                     related_name='%(class)s',
                                   )
@@ -165,7 +165,6 @@ class PlaceReport(models.Model):
 
 
 class Photo(models.Model):
-    name = models.CharField(max_length=50)
     photo_img = models.ImageField(upload_to='images/', null=True)
 
     def image_tag(self):
@@ -178,3 +177,14 @@ class Photo(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class PlaceSubmit(models.Model):
+    place = models.CharField(max_length=50, blank=True, null=True)
+    description = models.TextField(max_length=400)
+    photo_id_list = models.CharField(validators=[int_list_validator], max_length=10, blank=True, null=True)  
+    signature = models.CharField(max_length=20, blank=True, null=True)
+    is_checked = models.BooleanField(default= False)
+
+    def __str__(self):
+        return self.place+" "+self.description
