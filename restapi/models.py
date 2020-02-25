@@ -161,7 +161,7 @@ class PlaceReport(models.Model):
     is_checked = models.BooleanField(default= False)
 
     def __str__(self):
-        return self.place_name+" "+self.description
+        return str(self.place_name)+" "+self.description
 
 
 class Photo(models.Model):
