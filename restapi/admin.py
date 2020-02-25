@@ -16,11 +16,11 @@ admin.site.register(Credits)
 
 class PhotoAdmin(admin.ModelAdmin):
     #admin_image.allow_tags = True
-    list_display = ('name', 'image_tag', 'is_checked')
+    list_display = ('name', 'image_tag')
 
 
 class PlaceReportAdmin(admin.ModelAdmin):
-    list_display = ('local_name', 'description', 'image_tag', 'signature', 'is_checked')
+    list_display = ('place_name', 'description', 'photo_id_list', 'signature', 'is_checked')
 
 
 admin.site.register(PlaceReport, PlaceReportAdmin)
