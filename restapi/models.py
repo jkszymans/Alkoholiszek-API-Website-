@@ -156,7 +156,7 @@ class PlaceReport(models.Model):
                                     related_name='%(class)s',
                                   )
     description = models.TextField(max_length=400)
-    photo_id_list = models.CharField(validators=[int_list_validator], max_length=10)  
+    photo_id_list = models.CharField(validators=[int_list_validator], max_length=10, blank=True, null=True)  
     signature = models.CharField(max_length=20, blank=True, null=True)
     is_checked = models.BooleanField(default= False)
 
