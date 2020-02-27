@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 from random import randint
 from django.db.models import Count
 from django.conf import settings
-from django.db.models.signals import post_save
+from django.db.models.signals import post_init
 from django.core.validators import int_list_validator
 
 WEEKDAYS = [
@@ -68,7 +68,7 @@ def create_weekday(sender, instance, **kwargs):
         inst_hours.place=instance
         inst_hours.save()
 
-post_save.connect(create_weekday, sender=Place)
+post_init.connect(create_weekday, sender=Place)
 
 
 class Alcohol(models.Model):
