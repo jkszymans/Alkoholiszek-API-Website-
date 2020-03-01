@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 from random import randint
 from django.db.models import Count
 from django.conf import settings
-from django.db.models.signals import post_init
+from django.db.models.signals import post_save
 from django.core.validators import int_list_validator
 
 WEEKDAYS = [
@@ -62,13 +62,23 @@ class OpeningHours(models.Model):
 
 
 def create_weekday(sender, instance, **kwargs):
-    for i in range(0,7):
+    lista=[1,2,3,4,5,6,7]
+    open_days_obj_count = len(instance.openinghours.values('week_day'))
+    for i in range(1,open_days_obj_count+1):
+        value = instance.openinghours.values('week_day')[i-1]['week_day']
+        lista.remove(value)
+    week_day_count=0
+    while open_days_obj_count != 7:
+        
         inst_hours = OpeningHours()
-        inst_hours.week_day=i
+        inst_hours.week_day=lista[week_day_count]
         inst_hours.place=instance
         inst_hours.save()
+        week_day_count+=1
+        open_days_obj_count+=1
 
-post_init.connect(create_weekday, sender=Place)
+
+post_save.connect(create_weekday, sender=Place)
 
 
 class Alcohol(models.Model):
