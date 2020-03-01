@@ -64,12 +64,12 @@ class OpeningHours(models.Model):
 def create_weekday(sender, instance, **kwargs):
     lista=[1,2,3,4,5,6,7]
     open_days_obj_count = len(instance.openinghours.values('week_day'))
-    for i in range(1,open_days_obj_count+1):
-        value = instance.openinghours.values('week_day')[i-1]['week_day']
-        lista.remove(value)
+    if open_days_obj_count!=0:
+        for i in range(1,open_days_obj_count+1):
+            value = instance.openinghours.values('week_day')[i-1]['week_day']
+            lista.remove(value)
     week_day_count=0
     while open_days_obj_count != 7:
-        
         inst_hours = OpeningHours()
         inst_hours.week_day=lista[week_day_count]
         inst_hours.place=instance
