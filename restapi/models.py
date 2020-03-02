@@ -171,7 +171,7 @@ class PlaceReport(models.Model):
     is_checked = models.BooleanField(default= False)
 
     def __str__(self):
-        return str(self.place_name)+" "+self.description
+        return str(self.place)+" "+self.description
 
 
 class Photo(models.Model):
@@ -184,9 +184,6 @@ class Photo(models.Model):
             return 'No Image Found'
 
     image_tag.short_description = 'Image'
-
-    def __str__(self):
-        return self.name
 
 
 class PlaceSubmit(models.Model):
