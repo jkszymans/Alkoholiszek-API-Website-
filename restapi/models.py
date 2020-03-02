@@ -194,4 +194,4 @@ class PlaceSubmit(models.Model):
     is_checked = models.BooleanField(default= False)
 
     def __str__(self):
-        return self.place+" "+self.description
+        return self.place+" "+str(self.description)
