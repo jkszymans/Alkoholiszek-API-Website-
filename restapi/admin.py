@@ -14,16 +14,16 @@ admin.site.register(OpeningHours)
 admin.site.register(Credits)
 
 
-# class PhotoAdmin(admin.ModelAdmin):
-#     #admin_image.allow_tags = True
-#     list_display = ('image_tag',)
+class PhotoAdmin(admin.ModelAdmin):
+    #admin_image.allow_tags = True
+    list_display = ('image_tag',)
 
 
-# class PlaceReportAdmin(admin.ModelAdmin):
-#     list_display = ('place', 'description', 'photo_id_list', 'signature', 'is_checked')
+class PlaceReportAdmin(admin.ModelAdmin):
+    list_display = ('place', 'description', 'photo_id_list', 'signature', 'is_checked')
 
 
-admin.site.register(PlaceReport)
-admin.site.register(Photo)
+admin.site.register(PlaceReport, PlaceReportAdmin)
+admin.site.register(Photo, PhotoAdmin)
 admin.site.register(PlaceSubmit)
 
