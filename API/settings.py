@@ -5,7 +5,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = secret.SECRET_KEY
 
-DEBUG = (os.environ.get('DEBUG_VALUE') == 'True')
+DEBUG = secret.DEBUG
 
 ALLOWED_HOSTS = secret.ALLOWED_HOSTS
 
