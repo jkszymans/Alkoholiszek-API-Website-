@@ -11,6 +11,8 @@ urlpatterns = [
     path('images/', views.PhotoUploadView.as_view()),
     path('images/all/', views.PhotoList, name='list'),
     path('report-place/', views.ReportUpload.as_view()),
+    path('add-place/', views.PlaceAddUpload.as_view()),
+    path('new-place/', views.PlaceUpload.as_view())
 ]
 
 

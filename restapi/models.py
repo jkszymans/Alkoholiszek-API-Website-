@@ -85,6 +85,9 @@ class Alcohol(models.Model):
     def __str__(self):
         return self.name
 
+    def alcohol_places(self):
+        return ', '.join([a.name for a in self.place.all()])
+
     class Meta:
         abstract = True
 
@@ -93,10 +96,8 @@ class Drink(Alcohol):
     pass
 
 
-
 class Shot(Alcohol):
     pass
-
 
 
 class Beer(Alcohol):
@@ -184,3 +185,22 @@ class PlaceReport(models.Model):
 
     def __str__(self):
         return self.description
+
+
+class AddPlace(models.Model):
+    place_name = models.CharField(max_length=100, blank=False, default="default")
+    description = models.TextField(max_length=255)
+    place_image = models.ImageField(null=True, upload_to='places/')
+    signature = models.CharField(max_length=20)
+    is_checked = models.BooleanField(default=False)
+
+    def image_tag(self):
+        if self.place_image:
+            return mark_safe('<img src="%s" style="width: 200px; height:200px;" />' % self.place_image.url)
+        else:
+            return 'No Image Found'
+
+    image_tag.short_description = 'Add'
+
+    def __str__(self):
+        return self.place_name

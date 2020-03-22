@@ -11,7 +11,7 @@ from rest_framework.viewsets import ModelViewSet
 
 
 from .models import Place, Shot, Drink, Beer, Opinion, OpeningHours, Photo, PlaceReport
-from .serializers import PlaceDetailSerializer, PlaceListSerializer, OpinionSerializer, PhotoSerializer, PlaceReportSerializer
+from .serializers import PlaceDetailSerializer, PlaceListSerializer, OpinionSerializer, PhotoSerializer, PlaceReportSerializer, PlaceAddSerializer, NewPlaceSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter 
 from django_filters import FilterSet
@@ -229,4 +229,27 @@ class ReportUpload(APIView):
             return Response(report_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class PlaceUpload(APIView):
+    parser_class = (FileUploadParser,)
 
+    def post(self, request, *args, **kwargs):
+
+        place_serializer = NewPlaceSerializer(data=request.data)
+        if place_serializer.is_valid():
+            place_serializer.save()
+            return Response(place_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(place_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PlaceAddUpload(APIView):
+    parser_class = (FileUploadParser,)
+
+    def post(self, request, *args, **kwargs):
+
+        add_serializer = PlaceAddSerializer(data=request.data)
+        if add_serializer.is_valid():
+            add_serializer.save()
+            return Response(add_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(add_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

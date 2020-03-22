@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load static from staticfiles %}
+<link rel="stylesheet" href="{% static 'home.css' %}" type="text/css">
+    <head>
+        <meta charset="UTF-8">
+        <title>add_place</title>
+    </head>
+    <body>
+        <form method='POST'> {% csrf_token %}
+            {{ form.as_p }}
+            <input type = 'submit' value='Save' />
+        </form>
+    </body>
+{% endblock content %}
+</html>

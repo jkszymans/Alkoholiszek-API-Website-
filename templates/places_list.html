@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+{% extends 'base.html' %}
+{% load static from staticfiles %}
+<head>
+    <meta charset="UTF-8">
+    <title>Places list</title>
+</head>
+<body>
+    {% block content %}
+        {% for place in places %}
+            <li><a href="{{ place.get_absolute_url }}"> {{ place.name }}</a></li>
+    {% endfor %}
+
+    {% endblock %}
+</body>
+</html>

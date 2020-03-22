@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+{% extends 'base.html' %}
+{% load static from staticfiles %}
+<head>
+    <meta charset="UTF-8">
+    <title>Place details</title>
+</head>
+{% block content %}
+    <body>
+        <h1>Place name: {{places.name}}</h1>
+        <h1>Place address: {{places.address}}</h1>
+        <h1>District: {{places.district}}</h1>
+        <h1>Link: {{places.link}}</h1>
+        <h1>Info: {{places.additionalInfo}}</h1>
+        <a href="{% url 'mysite:place_update' places.id places.name %}" class="btn btn-primary">Uptade info</a>
+        <a href="#" class="btn btn-primary">Show drinks</a>
+    </body>
+{% endblock %}
+</html>
